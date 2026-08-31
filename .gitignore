@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets and sensitive files
+password.txt
+password-decoded.txt
+alertmanager-base64.txt
+*.pem
+*.key
+.env
+.env.*

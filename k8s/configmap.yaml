@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloud-task-manager-config
+  namespace: cloud-devops
+
+data:
+  APP_NAME: "Cloud Task Manager"
+  APP_ENV: "production"

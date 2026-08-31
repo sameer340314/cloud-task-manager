@@ -1,0 +1,41 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cloud-task-manager-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: cloud-task-manager
+      rules:
+        - alert: CloudTaskManagerHighCPU
+          expr: |
+            (
+              sum(
+                rate(container_cpu_usage_seconds_total{
+                  namespace="cloud-devops",
+                  pod=~"cloud-task-manager-.*",
+                  container!="POD",
+                  container!=""
+                }[5m])
+              ) by (pod)
+            )
+            /
+            (
+              sum(
+                kube_pod_container_resource_requests{
+                  namespace="cloud-devops",
+                  pod=~"cloud-task-manager-.*",
+                  resource="cpu",
+                  unit="core"
+                }
+              ) by (pod)
+            )
+            * 100 > 70
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Cloud Task Manager high CPU usage"
+            description: "Cloud Task Manager pod CPU usage is above 70% for more than 2 minutes."

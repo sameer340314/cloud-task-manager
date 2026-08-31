@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-task-manager
+  namespace: cloud-devops
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: cloud-task-manager
+
+  template:
+    metadata:
+      labels:
+        app: cloud-task-manager
+
+    spec:
+      containers:
+        - name: cloud-task-manager
+          image: sameer340314/cloud-task-manager:v2
+
+          envFrom:
+            - configMapRef:
+                name: cloud-task-manager-config
+            - secretRef:
+                name: cloud-task-manager-secret
+
+          ports:
+            - containerPort: 8080
+
+          volumeMounts:
+            - name: task-manager-storage
+              mountPath: /data
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+      volumes:
+        - name: task-manager-storage
+          persistentVolumeClaim:
+            claimName: cloud-task-manager-pvc
