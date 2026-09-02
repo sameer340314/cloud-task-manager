@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: cloud-task-manager-alertmanager
+  namespace: cloud-devops
+
+spec:
+  route:
+    groupBy:
+      - alertname
+      - namespace
+    groupWait: 10s
+    groupInterval: 1m
+    repeatInterval: 1h
+    receiver: cloud-task-manager-webhook
+
+  receivers:
+    - name: cloud-task-manager-webhook
+      webhookConfigs:
+        - url: http://webhook-test.monitoring.svc:8080
