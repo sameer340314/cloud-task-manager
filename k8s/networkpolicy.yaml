@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cloud-task-manager-network-policy
+  namespace: cloud-devops
+spec:
+  podSelector:
+    matchLabels:
+      app: cloud-task-manager
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: cloud-devops
+    ports:
+    - protocol: TCP
+      port: 8080
