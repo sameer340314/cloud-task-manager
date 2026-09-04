@@ -385,12 +385,12 @@ This project demonstrates practical knowledge of:
 * Troubleshooting
 * Production-style deployment practices
 
-## 🎤 Interview Explanation
 
-> Cloud Task Manager is a containerized React application deployed on Kubernetes. I implemented GitHub Actions for CI/CD, Docker for containerization, Kubernetes Deployment and Service for application deployment, HPA for autoscaling, PVC for persistent storage, RBAC and NetworkPolicy for security, Prometheus and Grafana for monitoring, Alertmanager for alerting, and Terraform for Infrastructure as Code.
 
 ## 👨‍💻 Author
 
-** md Sameer **
+**md Sameer **
 
 Cloud + DevOps Engineer Portfolio Project
+
+
