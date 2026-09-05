@@ -1,8 +1,29 @@
-# Cloud Task Manager 🚀
+# ☁️ Cloud Task Manager
 
-A production-style React task management application deployed using Docker and Kubernetes, automated through GitHub Actions CI/CD, monitored with Prometheus and Grafana, secured with Kubernetes security controls, and managed using Terraform.
+A production-style React Task Management application with Docker, Kubernetes, CI/CD, Monitoring, Security, Terraform and GitHub Pages deployment.
 
-## 🎯 Project Overview
+## 🚀 Live Demo
+
+👉 https://sameer340314.github.io/cloud-task-manager/
+
+The application is publicly accessible from any device with an internet connection.
+
+## 🛠️ Tech Stack
+
+- React
+- Vite
+- JavaScript
+- Docker
+- Docker Hub
+- Kubernetes
+- GitHub Actions
+- Terraform
+- Prometheus
+- Grafana
+- Alertmanager
+- GitHub Pages                 
+
+# 🎯 Project Overview
 
 Cloud Task Manager is an end-to-end Cloud + DevOps project demonstrating the practical lifecycle of a modern cloud-native application:
 
