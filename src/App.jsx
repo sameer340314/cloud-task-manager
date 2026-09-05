@@ -4,45 +4,35 @@ import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import TaskCard from "./components/TaskCard";
 
-function App() {
-  // =========================
-  // Task Form
-  // =========================
+function createTaskId() {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
 
+  return `${Date.now()}-${Math.random()
+    .toString(36)
+    .substring(2, 9)}`;
+}
+
+function App() {
   const [task, setTask] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Medium");
   const [dueDate, setDueDate] = useState("");
 
-  // =========================
-  // Settings
-  // =========================
-
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
-
-  // =========================
-  // Search / Filter / Sort
-  // =========================
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [priorityFilter, setPriorityFilter] = useState("All");
   const [sortBy, setSortBy] = useState("Newest");
 
-  // =========================
-  // Edit Task
-  // =========================
-
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editPriority, setEditPriority] = useState("Medium");
   const [editDueDate, setEditDueDate] = useState("");
-
-  // =========================
-  // Tasks
-  // =========================
 
   const [tasks, setTasks] = useState(() => {
     try {
@@ -51,7 +41,18 @@ function App() {
       );
 
       if (savedTasks) {
-        return JSON.parse(savedTasks);
+        const parsedTasks = JSON.parse(savedTasks);
+
+        if (Array.isArray(parsedTasks)) {
+          return parsedTasks.map((item) => ({
+            id: item.id || createTaskId(),
+            title: item.title || "",
+            description: item.description || "",
+            priority: item.priority || "Medium",
+            dueDate: item.dueDate || "",
+            status: item.status || "Pending",
+          }));
+        }
       }
     } catch (error) {
       console.error(
@@ -62,6 +63,7 @@ function App() {
 
     return [
       {
+        id: createTaskId(),
         title: "React Dashboard",
         description: "Complete the frontend dashboard",
         priority: "High",
@@ -69,6 +71,7 @@ function App() {
         status: "Completed",
       },
       {
+        id: createTaskId(),
         title: "Docker Setup",
         description: "Build and test Docker container",
         priority: "Medium",
@@ -77,10 +80,6 @@ function App() {
       },
     ];
   });
-
-  // =========================
-  // Save Tasks
-  // =========================
 
   useEffect(() => {
     try {
@@ -96,10 +95,6 @@ function App() {
     }
   }, [tasks]);
 
-  // =========================
-  // Dashboard Statistics
-  // =========================
-
   const totalTasks = tasks.length;
 
   const completedTasks = tasks.filter(
@@ -114,16 +109,13 @@ function App() {
     (item) => item.priority === "High"
   ).length;
 
-  // =========================
-  // Add Task
-  // =========================
-
   const addTask = () => {
     if (task.trim() === "") {
       return;
     }
 
     const newTask = {
+      id: createTaskId(),
       title: task.trim(),
       description: description.trim(),
       priority: priority,
@@ -142,24 +134,22 @@ function App() {
     setDueDate("");
   };
 
-  // =========================
-  // Delete Task
-  // =========================
-
-  const deleteTask = (index) => {
+  const deleteTask = (id) => {
     setTasks((currentTasks) =>
-      currentTasks.filter((_, i) => i !== index)
+      currentTasks.filter(
+        (item) => item.id !== id
+      )
     );
+
+    if (editingId === id) {
+      cancelEdit();
+    }
   };
 
-  // =========================
-  // Toggle Task Status
-  // =========================
-
-  const toggleStatus = (index) => {
+  const toggleStatus = (id) => {
     setTasks((currentTasks) =>
-      currentTasks.map((item, i) =>
-        i === index
+      currentTasks.map((item) =>
+        item.id === id
           ? {
               ...item,
               status:
@@ -172,26 +162,24 @@ function App() {
     );
   };
 
-  // =========================
-  // Start Edit
-  // =========================
+  const startEdit = (id) => {
+    const item = tasks.find(
+      (taskItem) => taskItem.id === id
+    );
 
-  const startEdit = (index) => {
-    const item = tasks[index];
+    if (!item) {
+      return;
+    }
 
-    setEditingIndex(index);
+    setEditingId(id);
     setEditTitle(item.title);
     setEditDescription(item.description);
     setEditPriority(item.priority);
     setEditDueDate(item.dueDate || "");
   };
 
-  // =========================
-  // Save Edit
-  // =========================
-
   const saveEdit = () => {
-    if (editingIndex === null) {
+    if (editingId === null) {
       return;
     }
 
@@ -200,8 +188,8 @@ function App() {
     }
 
     setTasks((currentTasks) =>
-      currentTasks.map((item, i) =>
-        i === editingIndex
+      currentTasks.map((item) =>
+        item.id === editingId
           ? {
               ...item,
               title: editTitle.trim(),
@@ -216,27 +204,23 @@ function App() {
     cancelEdit();
   };
 
-  // =========================
-  // Cancel Edit
-  // =========================
-
   const cancelEdit = () => {
-    setEditingIndex(null);
+    setEditingId(null);
     setEditTitle("");
     setEditDescription("");
     setEditPriority("Medium");
     setEditDueDate("");
   };
 
-  // =========================
-  // Search + Filters
-  // =========================
-
   const filteredTasks = tasks.filter((item) => {
-    const searchText = search.toLowerCase().trim();
+    const searchText = search
+      .toLowerCase()
+      .trim();
 
     const matchesSearch =
-      item.title.toLowerCase().includes(searchText) ||
+      item.title
+        .toLowerCase()
+        .includes(searchText) ||
       item.description
         .toLowerCase()
         .includes(searchText);
@@ -255,10 +239,6 @@ function App() {
       matchesPriority
     );
   });
-
-  // =========================
-  // Sorting
-  // =========================
 
   const sortedTasks = [...filteredTasks].sort(
     (a, b) => {
@@ -288,20 +268,20 @@ function App() {
           return -1;
         }
 
-        return a.dueDate.localeCompare(b.dueDate);
+        return a.dueDate.localeCompare(
+          b.dueDate
+        );
       }
 
       if (sortBy === "Status") {
-        return a.status.localeCompare(b.status);
+        return a.status.localeCompare(
+          b.status
+        );
       }
 
       return 0;
     }
   );
-
-  // =========================
-  // Clear Filters
-  // =========================
 
   const clearFilters = () => {
     setSearch("");
@@ -309,10 +289,6 @@ function App() {
     setPriorityFilter("All");
     setSortBy("Newest");
   };
-
-  // =========================
-  // UI
-  // =========================
 
   return (
     <div
@@ -322,25 +298,15 @@ function App() {
           : "app"
       }
     >
-      {/* Navbar */}
-
       <Navbar />
 
       <div className="layout">
 
-        {/* Sidebar */}
-
         <Sidebar />
-
-        {/* Main Content */}
 
         <main className="content">
 
           <h2>My DevOps Tasks</h2>
-
-          {/* =========================
-              Statistics
-          ========================= */}
 
           <div className="stats">
 
@@ -365,10 +331,6 @@ function App() {
             </div>
 
           </div>
-
-          {/* =========================
-              Add Task
-          ========================= */}
 
           <div className="inputBox">
 
@@ -422,10 +384,6 @@ function App() {
             </button>
 
           </div>
-
-          {/* =========================
-              Search / Filter / Sort
-          ========================= */}
 
           <div className="filterBox">
 
@@ -512,11 +470,7 @@ function App() {
 
           </div>
 
-          {/* =========================
-              Edit Task
-          ========================= */}
-
-          {editingIndex !== null && (
+          {editingId !== null && (
             <div className="editBox">
 
               <h2>Edit Task</h2>
@@ -577,10 +531,6 @@ function App() {
             </div>
           )}
 
-          {/* =========================
-              Task List
-          ========================= */}
-
           <div className="taskList">
 
             {sortedTasks.length === 0 ? (
@@ -597,46 +547,36 @@ function App() {
 
             ) : (
 
-              sortedTasks.map((item) => {
+              sortedTasks.map((item) => (
 
-                const index =
-                  tasks.indexOf(item);
+                <TaskCard
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  description={item.description}
+                  priority={item.priority}
+                  dueDate={item.dueDate}
+                  status={item.status}
+                  onDelete={() =>
+                    deleteTask(item.id)
+                  }
+                  onToggle={() =>
+                    toggleStatus(item.id)
+                  }
+                  onEdit={() =>
+                    startEdit(item.id)
+                  }
+                />
 
-                return (
-                  <TaskCard
-                    key={index}
-                    title={item.title}
-                    description={item.description}
-                    priority={item.priority}
-                    dueDate={item.dueDate}
-                    status={item.status}
-                    onDelete={() =>
-                      deleteTask(index)
-                    }
-                    onToggle={() =>
-                      toggleStatus(index)
-                    }
-                    onEdit={() =>
-                      startEdit(index)
-                    }
-                  />
-                );
-
-              })
+              ))
 
             )}
 
           </div>
 
-          {/* =========================
-              Settings
-          ========================= */}
-
           <div className="settingsBox">
 
             <h2>Settings</h2>
-
-            {/* Dark Mode */}
 
             <div className="settingItem">
 
@@ -660,8 +600,6 @@ function App() {
               </button>
 
             </div>
-
-            {/* Notifications */}
 
             <div className="settingItem">
 

@@ -1,4 +1,5 @@
 function TaskCard({
+  id,
   title,
   description,
   priority,
@@ -10,6 +11,11 @@ function TaskCard({
 }) {
   return (
     <div className="card">
+
+      <p>
+        <strong>Task ID:</strong>{" "}
+        <code>{id}</code>
+      </p>
 
       <h3>{title}</h3>
 
