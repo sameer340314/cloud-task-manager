@@ -1,15 +1,52 @@
-function TaskCard({ title, status, onDelete, onToggle }) {
+function TaskCard({
+  title,
+  description,
+  priority,
+  dueDate,
+  status,
+  onDelete,
+  onToggle,
+  onEdit,
+}) {
   return (
     <div className="card">
+
       <h3>{title}</h3>
 
+      <p>{description}</p>
+
       <p>
-        Status:
+        Priority:{" "}
         <span
           style={{
-            color: status === "Completed" ? "green" : "orange",
             fontWeight: "bold",
-            marginLeft: "5px",
+            color:
+              priority === "High"
+                ? "red"
+                : priority === "Medium"
+                ? "orange"
+                : "green",
+          }}
+        >
+          {priority}
+        </span>
+      </p>
+
+      {dueDate && (
+        <p>
+          Due Date: <strong>{dueDate}</strong>
+        </p>
+      )}
+
+      <p>
+        Status:{" "}
+        <span
+          style={{
+            color:
+              status === "Completed"
+                ? "green"
+                : "orange",
+            fontWeight: "bold",
           }}
         >
           {status}
@@ -24,7 +61,20 @@ function TaskCard({ title, status, onDelete, onToggle }) {
           marginRight: "8px",
         }}
       >
-        Complete
+        {status === "Pending"
+          ? "Complete"
+          : "Undo"}
+      </button>
+
+      <button
+        onClick={onEdit}
+        style={{
+          background: "#2563eb",
+          color: "white",
+          marginRight: "8px",
+        }}
+      >
+        Edit
       </button>
 
       <button
@@ -36,6 +86,7 @@ function TaskCard({ title, status, onDelete, onToggle }) {
       >
         Delete
       </button>
+
     </div>
   );
 }
