@@ -54,7 +54,7 @@ resource "kubernetes_deployment_v1" "cloud_task_manager" {
       spec {
         service_account_name            = "cloud-task-manager-sa"
         automount_service_account_token = false
-        enable_service_links             = false
+        enable_service_links            = false
 
         termination_grace_period_seconds = 30
 
@@ -70,7 +70,7 @@ resource "kubernetes_deployment_v1" "cloud_task_manager" {
 
         container {
           name              = "cloud-task-manager"
-          image             = "sameer340314/cloud-task-manager:v3"
+          image             = "sameer340314/cloud-task-manager:04b64e2"
           image_pull_policy = "IfNotPresent"
 
           port {
