@@ -133,7 +133,16 @@ The GitHub Actions pipeline performs:
 4. Build the React application
 5. Build Docker image
 6. Authenticate with Docker Hub
-7. Push Docker image to Docker Hub
+7. Push Docker image to Docker Hub 
+
+### Docker Image Versioning
+
+Docker images use immutable Git commit SHA-based tags.
+
+```text
+Git Commit: 04b64e2
+Docker Image: sameer340314/cloud-task-manager:04b64e2
+Release: v1.0.0
 
 ## ☸️ Kubernetes Deployment
 
